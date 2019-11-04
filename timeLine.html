@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="echarts.js"></script>
+    <script src="vue.js"></script>
+    <style>
+        .timeLine_content {
+            position: relative;
+            padding-bottom: calc(100% * 4 / 16);
+            background-color: #fff;
+            overflow: hidden;
+        }
+
+        .timeLine_chart {
+            position: absolute;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="timeLine" id="timeLine" ref="timeLine">
+            <!--时间线图主体-->
+            <div class="timeLine_content" id="time-linechart-cont">
+                <div class="timeLine_chart" id="timeLinechart" ref="timeLine_chart"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let baseWidth = 100, multiple = 0.8;
+        let baseHeight = 50 * multiple;
+        let baseMargin = 50;
+        var app = new Vue({
+            el: '#app',
+            data: {
+                /*图标对象*/
+                eChartsObj: null,
+
+                /*X轴刻度数据*/
+                XAxisData: [1534262400,1534305600,1534348800,1534392000,1534435200,1534478400,1534521600,1534564800,1534608000,1534651200,1534694400,1534737600,1534780800,1534824000,1534867200,1534910400,1534953600],
+                /*x轴每个格子表示的时间长度*/
+                eachInterval: 43200,
+
+                /*Y轴刻度数据*/
+                YAxisData: 
+                [
+                    [
+                        {
+                            "name":"红山网",
+                            "id":"红山网",
+                            "time":1534262400,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"山东省海阳市党建网",
+                            "id":"山东省海阳市党建网",
+                            "time":1534262400,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"内蒙古电视台",
+                            "id":"内蒙古电视台",
+                            "time":1534262400,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"青海网络广播电视台",
+                            "id":"青海网络广播电视台",
+                            "time":1534262400,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"华龙网",
+                            "id":"华龙网",
+                            "time":1534262400,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"科尔沁左翼后旗人民政府",
+                            "id":"科尔沁左翼后旗人民政府",
+                            "time":1534262400,
+                            "category":"网站"
+                        }
+                    ],
+                    [
+                        {
+                            "name":"观察者网",
+                            "id":"观察者网",
+                            "time":1534331590,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"文汇报",
+                            "id":"文汇报",
+                            "time":1534331274,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"网易-首页-新闻（要闻）",
+                            "id":"网易-首页-新闻（要闻）",
+                            "time":1534323221,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"中国访谈网",
+                            "id":"中国访谈网",
+                            "time":1534323824,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"南报网",
+                            "id":"南报网",
+                            "time":1534322520,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"凤凰新闻",
+                            "id":"凤凰新闻",
+                            "time":1534322880,
+                            "category":"APP"
+                        },
+                        {
+                            "name":"无锡新传媒",
+                            "id":"无锡新传媒",
+                            "time":1534335288,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"新华报业网",
+                            "id":"新华报业网",
+                            "time":1534326672,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"光明网",
+                            "id":"光明网",
+                            "time":1534323120,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"中国日报网",
+                            "id":"中国日报网",
+                            "time":1534324298,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"央广网",
+                            "id":"央广网",
+                            "time":1534326180,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"扬子晚报网",
+                            "id":"扬子晚报网",
+                            "time":1534326675,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"南通网",
+                            "id":"南通网",
+                            "time":1534325970,
+                            "category":"微博"
+                        },
+                        {
+                            "isTenant":true,
+                            "name":"inews",
+                            "id":"inews",
+                            "time":1534322640,
+                            "category":"旗下媒体"
+                        },
+                        {
+                            "name":"吉林电视网",
+                            "id":"吉林电视网",
+                            "time":1534324095,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"上观新闻",
+                            "id":"上观新闻",
+                            "time":1534323660,
+                            "category":"APP"
+                        },
+                        {
+                            "name":"京报网",
+                            "id":"京报网",
+                            "time":1534322847,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"北方网",
+                            "id":"北方网",
+                            "time":1534326670,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"老友网",
+                            "id":"老友网",
+                            "time":1534325233,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"广佛都市网",
+                            "id":"广佛都市网",
+                            "time":1534323420,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"中国网头条",
+                            "id":"中国网头条",
+                            "time":1534323684,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"环球网头条",
+                            "id":"环球网头条",
+                            "time":1534322520,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"搜狐头条",
+                            "id":"搜狐头条",
+                            "time":1534323060,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"红网",
+                            "id":"红网",
+                            "time":1534326670,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"新浪新闻",
+                            "id":"新浪新闻",
+                            "time":1534341739,
+                            "category":"APP"
+                        },
+                        {
+                            "name":"中国山东网",
+                            "id":"中国山东网",
+                            "time":1534324317,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"海口晚报网",
+                            "id":"海口晚报网",
+                            "time":1534322591,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"临溟旗帜",
+                            "id":"临溟旗帜",
+                            "time":1534310550,
+                            "category":"微信"
+                        },
+                        {
+                            "name":"中国抚州网",
+                            "id":"中国抚州网",
+                            "time":1534322700,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"中国西藏网",
+                            "id":"中国西藏网",
+                            "time":1534322400,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"今日湖北网",
+                            "id":"今日湖北网",
+                            "time":1534325049,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"平凉市公安局",
+                            "id":"平凉市公安局",
+                            "time":1534325943,
+                            "category":"微信"
+                        },
+                        {
+                            "name":"凤凰网",
+                            "id":"凤凰网",
+                            "time":1534322927,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"澎湃",
+                            "id":"澎湃",
+                            "time":1534324380,
+                            "category":"网站"
+                        }
+                    ],
+                    [
+                        {
+                            "name":"中国农业发展银行",
+                            "id":"中国农业发展银行",
+                            "time":1534350541,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"德宏州纪委州监委网站",
+                            "id":"德宏州纪委州监委网站",
+                            "time":1534383427,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"山西共青团",
+                            "id":"山西共青团",
+                            "time":1534387451,
+                            "category":"网站"
+                        }
+                    ],
+                    [
+                        {
+                            "name":"中国阳泉",
+                            "id":"中国阳泉",
+                            "time":1534429717,
+                            "category":"头条"
+                        },
+                        {
+                            "name":"珠海市卫计局党建之声",
+                            "id":"珠海市卫计局党建之声",
+                            "time":1534409917,
+                            "category":"微信"
+                        },
+                        {
+                            "name":"泰山热力",
+                            "id":"泰山热力",
+                            "time":1534410420,
+                            "category":"微信"
+                        },
+                        {
+                            "name":"盈江县纪委县监委网站",
+                            "id":"盈江县纪委县监委网站",
+                            "time":1534422852,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"彩虹映天山",
+                            "id":"彩虹映天山",
+                            "time":1534418370,
+                            "category":"微信"
+                        },
+                        {
+                            "name":"双柏警方",
+                            "id":"双柏警方",
+                            "time":1534412846,
+                            "category":"微信"
+                        },
+                        {
+                            "name":"绥江警方",
+                            "id":"绥江警方",
+                            "time":1534412117,
+                            "category":"微信"
+                        }
+                    ],
+                    [
+                        {
+                            "name":"北方网新闻频道",
+                            "id":"北方网新闻频道",
+                            "time":1534436494,
+                            "category":"网站"
+                        }
+                    ],
+                    [
+                        {
+                            "name":"淮电微风",
+                            "id":"淮电微风",
+                            "time":1534514699,
+                            "category":"微信"
+                        },
+                        {
+                            "name":"大河网",
+                            "id":"大河网",
+                            "time":1534520419,
+                            "category":"网站"
+                        }
+                    ],
+                    [
+
+                    ],
+                    [
+                        {
+                            "name":"中国唐尧网",
+                            "id":"中国唐尧网",
+                            "time":1534576620,
+                            "category":"网站"
+                        }
+                    ],
+                    [
+                        {
+                            "name":"阿拉尔富丽达零距离",
+                            "id":"阿拉尔富丽达零距离",
+                            "time":1534646287,
+                            "category":"微信"
+                        }
+                    ],
+                    [
+
+                    ],
+                    [
+
+                    ],
+                    [
+
+                    ],
+                    [
+
+                    ],
+                    [
+
+                    ],
+                    [
+
+                    ],
+                    [
+                        {
+                            "name":"最高人民检察院",
+                            "id":"最高人民检察院",
+                            "time":1534915344,
+                            "category":"网站"
+                        },
+                        {
+                            "name":"延安干部培训学院",
+                            "id":"延安干部培训学院",
+                            "time":1534932078,
+                            "category":"微信"
+                        }
+                    ],
+                    [
+
+                    ]
+                ],
+                /*Y轴最大数量*/
+                maxYAxisData: 34,
+
+                /*关系图节点间的关系数据*/
+                graphLinksData: [
+                    {
+                        "source":"凤凰新闻",
+                        "target":"绥江警方"
+                    },
+                    {
+                        "source":"凤凰新闻",
+                        "target":"彩虹映天山"
+                    },
+                    {
+                        "source":"凤凰新闻",
+                        "target":"大河网"
+                    },
+                    {
+                        "source":"大河网",
+                        "target":"中国唐尧网"
+                    }
+                ],
+                /*节点分类的类目数据*/
+                graphCategoryData: [
+                    { 
+                        "name": "头条", "label": "头条", 
+                        "itemStyle": { "color": { "x": 0.2, "y": 0.2, "x2": 0.1, "y2": 1, "type": "linear", "global": false, "colorStops": [{ "offset": 0, "color": "rgb(167,167,167)" }, { "offset": 1, "color": "rgb(120,120,120)" }] } } 
+                    }, 
+                    { 
+                        "name": "网站", "label": "网站", 
+                        "itemStyle": { "color": { "x": 0.2, "y": 0.2, "x2": 0.1, "y2": 1, "type": "linear", "global": false, "colorStops": [{ "offset": 0, "color": "rgb(251, 118, 123)" }, { "offset": 1, "color": "rgb(204, 46, 72)" }] } }
+                    }, 
+                    { 
+                        "name": "微信", "label": "微信", 
+                        "itemStyle": { "color": { "x": 0.2, "y": 0.2, "x2": 0.1, "y2": 1, "type": "linear", "global": false, "colorStops": [{ "offset": 0, "color": "rgb(144,229,88)" }, { "offset": 1, "color": "rgb(107,194,49)" }] } } 
+                    }, 
+                    { 
+                        "name": "APP", "label": "APP", 
+                        "itemStyle": { "color": { "x": 0.2, "y": 0.2, "x2": 0.1, "y2": 1, "type": "linear", "global": false, "colorStops": [{ "offset": 0, "color": "rgb(129, 227, 238)" }, { "offset": 1, "color": "rgb(25, 183, 207)" }] } } 
+                    }, 
+                    { 
+                        "name": "微博", "label": "微博", 
+                        "itemStyle": { "color": { "x": 0.2, "y": 0.2, "x2": 0.1, "y2": 1, "type": "linear", "global": false, "colorStops": [{ "offset": 0, "color": "rgb(222,175,88)" }, { "offset": 1, "color": "rgb(194,145,49)" }] } } 
+                    }, 
+                    { 
+                        "name": "旗下媒体", "label": "旗下媒体", "itemStyle": { "color": "#fff" } 
+                    }
+                ],
+                /*关系图数据*/
+                graphData: 
+                [
+                    {
+                        "name":"中国阳泉",
+                        "showName":"中国阳泉",
+                        "category":"头条",
+                        "value":[
+                            350,
+                            20
+                        ],
+                        "transTime":1534429717
+                    },
+                    {
+                        "name":"最高人民检察院",
+                        "showName":"最高人民检察院",
+                        "category":"网站",
+                        "value":[
+                            1550,
+                            20
+                        ],
+                        "transTime":1534915344
+                    },
+                    {
+                        "name":"观察者网",
+                        "showName":"观察者网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            20
+                        ],
+                        "transTime":1534331590
+                    },
+                    {
+                        "name":"文汇报",
+                        "showName":"文汇报",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            60
+                        ],
+                        "transTime":1534331274
+                    },
+                    {
+                        "name":"网易-首页-新闻（要闻）",
+                        "showName":"网易-首页-新闻（要闻）",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            100
+                        ],
+                        "transTime":1534323221
+                    },
+                    {
+                        "name":"中国访谈网",
+                        "showName":"中国访谈网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            140
+                        ],
+                        "transTime":1534323824
+                    },
+                    {
+                        "name":"淮电微风",
+                        "showName":"淮电微风",
+                        "category":"微信",
+                        "value":[
+                            550,
+                            20
+                        ],
+                        "transTime":1534514699
+                    },
+                    {
+                        "name":"延安干部培训学院",
+                        "showName":"延安干部培训学院",
+                        "category":"微信",
+                        "value":[
+                            1550,
+                            60
+                        ],
+                        "transTime":1534932078
+                    },
+                    {
+                        "name":"南报网",
+                        "showName":"南报网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            180
+                        ],
+                        "transTime":1534322520
+                    },
+                    {
+                        "name":"中国农业发展银行",
+                        "showName":"中国农业发展银行",
+                        "category":"网站",
+                        "value":[
+                            250,
+                            20
+                        ],
+                        "transTime":1534350541
+                    },
+                    {
+                        "name":"凤凰新闻",
+                        "showName":"凤凰新闻",
+                        "category":"APP",
+                        "value":[
+                            150,
+                            220
+                        ],
+                        "transTime":1534322880
+                    },
+                    {
+                        "name":"无锡新传媒",
+                        "showName":"无锡新传媒",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            260
+                        ],
+                        "transTime":1534335288
+                    },
+                    {
+                        "name":"新华报业网",
+                        "showName":"新华报业网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            300
+                        ],
+                        "transTime":1534326672
+                    },
+                    {
+                        "name":"光明网",
+                        "showName":"光明网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            340
+                        ],
+                        "transTime":1534323120
+                    },
+                    {
+                        "name":"珠海市卫计局党建之声",
+                        "showName":"珠海市卫计局党建之声",
+                        "category":"微信",
+                        "value":[
+                            350,
+                            60
+                        ],
+                        "transTime":1534409917
+                    },
+                    {
+                        "name":"阿拉尔富丽达零距离",
+                        "showName":"阿拉尔富丽达零距离",
+                        "category":"微信",
+                        "value":[
+                            850,
+                            20
+                        ],
+                        "transTime":1534646287
+                    },
+                    {
+                        "name":"中国日报网",
+                        "showName":"中国日报网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            380
+                        ],
+                        "transTime":1534324298
+                    },
+                    {
+                        "name":"大河网",
+                        "showName":"大河网",
+                        "category":"网站",
+                        "value":[
+                            550,
+                            60
+                        ],
+                        "transTime":1534520419
+                    },
+                    {
+                        "name":"央广网",
+                        "showName":"央广网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            420
+                        ],
+                        "transTime":1534326180
+                    },
+                    {
+                        "name":"扬子晚报网",
+                        "showName":"扬子晚报网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            460
+                        ],
+                        "transTime":1534326675
+                    },
+                    {
+                        "name":"南通网",
+                        "showName":"南通网",
+                        "category":"微博",
+                        "value":[
+                            150,
+                            500
+                        ],
+                        "transTime":1534325970
+                    },
+                    {
+                        "name":"红山网",
+                        "showName":"红山网",
+                        "category":"网站",
+                        "value":[
+                            50,
+                            20
+                        ],
+                        "transTime":1534262400
+                    },
+                    {
+                        "name":"inews",
+                        "showName":"inews",
+                        "category":"旗下媒体",
+                        "value":[
+                            150,
+                            540
+                        ],
+                        "transTime":1534322640,
+                        "itemStyle":{
+                            "color":"#fff",
+                            "borderColor":"#000",
+                            "borderWidth":1
+                        },
+                        "label":{
+                            "color":"#000"
+                        }
+                    },
+                    {
+                        "name":"吉林电视网",
+                        "showName":"吉林电视网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            580
+                        ],
+                        "transTime":1534324095
+                    },
+                    {
+                        "name":"上观新闻",
+                        "showName":"上观新闻",
+                        "category":"APP",
+                        "value":[
+                            150,
+                            620
+                        ],
+                        "transTime":1534323660
+                    },
+                    {
+                        "name":"京报网",
+                        "showName":"京报网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            660
+                        ],
+                        "transTime":1534322847
+                    },
+                    {
+                        "name":"北方网",
+                        "showName":"北方网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            700
+                        ],
+                        "transTime":1534326670
+                    },
+                    {
+                        "name":"老友网",
+                        "showName":"老友网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            740
+                        ],
+                        "transTime":1534325233
+                    },
+                    {
+                        "name":"广佛都市网",
+                        "showName":"广佛都市网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            780
+                        ],
+                        "transTime":1534323420
+                    },
+                    {
+                        "name":"山东省海阳市党建网",
+                        "showName":"山东省海阳市党建网",
+                        "category":"网站",
+                        "value":[
+                            50,
+                            60
+                        ],
+                        "transTime":1534262400
+                    },
+                    {
+                        "name":"中国唐尧网",
+                        "showName":"中国唐尧网",
+                        "category":"网站",
+                        "value":[
+                            750,
+                            20
+                        ],
+                        "transTime":1534576620
+                    },
+                    {
+                        "name":"北方网新闻频道",
+                        "showName":"北方网新闻频道",
+                        "category":"网站",
+                        "value":[
+                            450,
+                            20
+                        ],
+                        "transTime":1534436494
+                    },
+                    {
+                        "name":"德宏州纪委州监委网站",
+                        "showName":"德宏州纪委州监委网站",
+                        "category":"网站",
+                        "value":[
+                            250,
+                            60
+                        ],
+                        "transTime":1534383427
+                    },
+                    {
+                        "name":"中国网头条",
+                        "showName":"中国网头条",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            820
+                        ],
+                        "transTime":1534323684
+                    },
+                    {
+                        "name":"内蒙古电视台",
+                        "showName":"内蒙古电视台",
+                        "category":"网站",
+                        "value":[
+                            50,
+                            100
+                        ],
+                        "transTime":1534262400
+                    },
+                    {
+                        "name":"环球网头条",
+                        "showName":"环球网头条",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            860
+                        ],
+                        "transTime":1534322520
+                    },
+                    {
+                        "name":"搜狐头条",
+                        "showName":"搜狐头条",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            900
+                        ],
+                        "transTime":1534323060
+                    },
+                    {
+                        "name":"青海网络广播电视台",
+                        "showName":"青海网络广播电视台",
+                        "category":"网站",
+                        "value":[
+                            50,
+                            140
+                        ],
+                        "transTime":1534262400
+                    },
+                    {
+                        "name":"红网",
+                        "showName":"红网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            940
+                        ],
+                        "transTime":1534326670
+                    },
+                    {
+                        "name":"泰山热力",
+                        "showName":"泰山热力",
+                        "category":"微信",
+                        "value":[
+                            350,
+                            100
+                        ],
+                        "transTime":1534410420
+                    },
+                    {
+                        "name":"新浪新闻",
+                        "showName":"新浪新闻",
+                        "category":"APP",
+                        "value":[
+                            150,
+                            980
+                        ],
+                        "transTime":1534341739
+                    },
+                    {
+                        "name":"中国山东网",
+                        "showName":"中国山东网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            1020
+                        ],
+                        "transTime":1534324317
+                    },
+                    {
+                        "name":"海口晚报网",
+                        "showName":"海口晚报网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            1060
+                        ],
+                        "transTime":1534322591
+                    },
+                    {
+                        "name":"临溟旗帜",
+                        "showName":"临溟旗帜",
+                        "category":"微信",
+                        "value":[
+                            150,
+                            1100
+                        ],
+                        "transTime":1534310550
+                    },
+                    {
+                        "name":"盈江县纪委县监委网站",
+                        "showName":"盈江县纪委县监委网站",
+                        "category":"网站",
+                        "value":[
+                            350,
+                            140
+                        ],
+                        "transTime":1534422852
+                    },
+                    {
+                        "name":"华龙网",
+                        "showName":"华龙网",
+                        "category":"网站",
+                        "value":[
+                            50,
+                            180
+                        ],
+                        "transTime":1534262400
+                    },
+                    {
+                        "name":"中国抚州网",
+                        "showName":"中国抚州网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            1140
+                        ],
+                        "transTime":1534322700
+                    },
+                    {
+                        "name":"中国西藏网",
+                        "showName":"中国西藏网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            1180
+                        ],
+                        "transTime":1534322400
+                    },
+                    {
+                        "name":"彩虹映天山",
+                        "showName":"彩虹映天山",
+                        "category":"微信",
+                        "value":[
+                            350,
+                            180
+                        ],
+                        "transTime":1534418370
+                    },
+                    {
+                        "name":"今日湖北网",
+                        "showName":"今日湖北网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            1220
+                        ],
+                        "transTime":1534325049
+                    },
+                    {
+                        "name":"平凉市公安局",
+                        "showName":"平凉市公安局",
+                        "category":"微信",
+                        "value":[
+                            150,
+                            1260
+                        ],
+                        "transTime":1534325943
+                    },
+                    {
+                        "name":"科尔沁左翼后旗人民政府",
+                        "showName":"科尔沁左翼后旗人民政府",
+                        "category":"网站",
+                        "value":[
+                            50,
+                            220
+                        ],
+                        "transTime":1534262400
+                    },
+                    {
+                        "name":"凤凰网",
+                        "showName":"凤凰网",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            1300
+                        ],
+                        "transTime":1534322927
+                    },
+                    {
+                        "name":"澎湃",
+                        "showName":"澎湃",
+                        "category":"网站",
+                        "value":[
+                            150,
+                            1340
+                        ],
+                        "transTime":1534324380
+                    },
+                    {
+                        "name":"双柏警方",
+                        "showName":"双柏警方",
+                        "category":"微信",
+                        "value":[
+                            350,
+                            220
+                        ],
+                        "transTime":1534412846
+                    },
+                    {
+                        "name":"绥江警方",
+                        "showName":"绥江警方",
+                        "category":"微信",
+                        "value":[
+                            350,
+                            260
+                        ],
+                        "transTime":1534412117
+                    },
+                    {
+                        "name":"山西共青团",
+                        "showName":"山西共青团",
+                        "category":"网站",
+                        "value":[
+                            250,
+                            100
+                        ],
+                        "transTime":1534387451
+                    }
+                ],
+
+            },
+            methods: {
+                /*系列列表*/
+                setupSeries() {
+                    let that = this;
+                    return [
+                        {
+                            type: 'graph',
+                            coordinateSystem: 'cartesian2d', /*该系列使用的坐标系*/
+                            hoverAnimation: true,
+                            layout: 'none', /*采用x y 确定位置*/
+                            draggable: false, /*节点是否可拖拽*/
+                            focusNodeAdjacency: false, /*高亮突出节点及邻节点*/
+                            symbol: 'path://M0,18.5 L0,18.5 L0,18.5 C-1.25125444e-15,8.28273213 8.28273213,1.87688166e-15 18.5,0 L80.5,0 L80.5,-1.77635684e-14 C90.7172679,-1.96404501e-14 99,8.28273213 99,18.5 L99,18.5 L99,18.5 C99,28.7172679 90.7172679,37 80.5,37 L18.5,37 L18.5,37 C8.28273213,37 1.25125444e-15,28.7172679 0,18.5 Z',
+                            symbolSize: [baseWidth * multiple, baseWidth * multiple],
+                            symbolKeepAspect: true,//保持该图形的长宽比
+                            edgeSymbol: ['none', 'arrow'], /*边两端的标记类型*/
+                            edgeSymbolSize: 6, /*边两端的标记大小*/
+                            itemStyle: {
+                                color: "#2d8cf0",
+                                borderWidth: 0,
+                                shadowBlur: 3,
+                                shadowColor: 'rgba(0, 0, 0, 0.3)'
+                            },
+                            lineStyle: {
+                                color: '#999',
+                                width: 1,
+                                curveness: 0.2,
+                            },
+                            label: {
+                                show: true,
+                                color: '#fff',
+                                position: 'inside',
+                                fontStyle: 'normal',
+                                fontWeight: 'bold',
+                                fontSize: 10,
+                                verticalAlign: 'middle',
+                                align: 'center',
+                                formatter(params) {
+                                    let name = params.data.showName;
+                                    if (name.length > 6) {
+                                        name = params.data.showName.substr(0, 6) + '...'
+                                    }
+                                    return name + '\n' + that.changeTime(params.data.transTime * 1000)
+                                }
+                            },
+                            categories: this.graphCategoryData, /*节点分类的类目*/
+                            data: this.graphData, /*关系图的节点数据列表*/
+                            links: this.graphLinksData, /*节点间的关系数据*/
+                            top: baseMargin,
+                            left: baseMargin,
+                            right: baseMargin,
+                            bottom: baseMargin,
+                            animation: true
+                        },
+                    ]
+                },
+
+
+                /*设置配置项*/
+                setupOptions() {
+                    let that = this;
+
+                    /* 计算坐标初始展示比例 */
+                    let line = document.getElementById('timeLinechart');
+                    let canvasWid = line.clientWidth || 0;
+                    let canvasHei = line.clientHeight || 0;
+                    let width = this.XAxisData.length * 100 + 2 * baseMargin;
+                    let height = this.maxYAxisData * 60;
+                    let xEnd = (canvasWid / width) * 100 || 100;
+                    let yEnd = (canvasHei / height) * 100 || 100;
+                    
+                    /* 将x坐标axisLabel时间戳转化为时间格式8-13 00:00 */
+                    let isBeginTime = that.XAxisData[0];  // x轴开始时间
+                    let isSpace = this.eachInterval       // x轴时间间隔
+                
+                    return {
+                        //背景颜色
+                        backgroundColor: '#fff',
+                        //图例参数
+                        legend: {
+                            show: false,
+                            left: baseMargin,
+                            top: baseMargin / 2,
+                            align: 'left'
+                        },
+                        //直角坐标系网格
+                        grid: {
+                            show: false,
+                            top: 20,
+                            left: baseMargin,
+                            right: baseMargin,
+                            bottom: 60,
+                        },
+                        //直角坐标系X轴
+                        xAxis: [
+                            //数值x轴
+                            {
+
+                                show: true,
+                                type: 'value',
+                                //最小间隔大小
+                                minInterval: 1,
+                                //强制分割间隙
+                                interval: baseWidth,
+                                min: 0,
+                                max: baseWidth * (this.XAxisData.length - 1),
+                                scale: false,
+                                axisLabel: {
+                                    formatter(value, index) {
+                                        return that.changeTime(((value / 100) * isSpace + isBeginTime) * 1000);
+                                    }
+                                },
+                                axisLine: {
+                                    show: false
+                                },
+                                splitLine: {
+                                    show: false
+                                },
+                                axisTick: {
+                                    alignWithLabel: true,
+                                    lineStyle: {
+                                        color: '#ff0000'
+                                    }
+                                }
+                            },
+                        ],
+                        //直角坐标系Y轴
+                        yAxis: {
+                            show: false,
+                            type: 'value',
+                            interval: baseHeight,
+                            min: 0,
+                            max: baseHeight * this.maxYAxisData,
+                            scale: false,
+                        },
+
+                        tooltip: {
+                            padding: 5,
+                            backgroundColor: 'rgba(0,0,0,0.6)',
+                            borderColor: 'rgba(0,0,0,0.2)',
+                            borderWidth: 0,
+                            formatter: function (obj) {
+                                var value = obj.value;
+                                let text = value ? `(${obj.data.category}) ${obj.data.name} ${that.changeTime(obj.data.transTime * 1000)}` : '';
+                                return text
+                            }
+                        },
+                        dataZoom: [
+                            {
+                                type: 'slider',
+                                xAxisIndex: 0,
+                                filterMode: 'filter',
+                                end: xEnd,
+                                showDetail: false,
+                            },
+                            {
+                                type: 'slider',
+                                yAxisIndex: 0,
+                                filterMode: 'filter',
+                                end: yEnd,
+                                showDetail: false
+                            },
+                            {
+                                type: 'inside',
+                                xAxisIndex: 0,
+                                filterMode: 'filter',
+                                end: xEnd,
+                                zoomOnMouseWheel: false
+                            },
+                            {
+                                type: 'inside',
+                                yAxisIndex: 0,
+                                filterMode: 'filter',
+                                end: yEnd,
+                                zoomOnMouseWheel: false
+                            }
+                        ],
+                        //系列列表数组
+                        series: this.setupSeries(),
+                    }
+                },
+
+                /************************旗下媒体********************/
+
+                init() {
+                    this.$nextTick(() => {
+
+                        let line = document.getElementById('timeLinechart');
+                        line.style.width = '1200px';
+                        line.style.height = '400px';
+                        line.style.left = 0;
+                        line.style.bottom = 0;
+
+                        //创建折线图控件
+                        let graphChart = echarts.init(line);
+
+                        //折线图渲染
+                        graphChart.setOption(this.setupOptions());
+
+
+                        let thiz = this;
+                        graphChart.on('click', function (params) {
+                            console.log('params', params)
+                            if (params.dataType !== 'node') {
+                                return;
+                            }
+
+                            if (params.dataIndex) {
+                             
+                                graphChart.dispatchAction({
+                                    type: 'focusNodeAdjacency',
+                                    dataIndex: params.dataIndex,
+                                    // seriesId: params.seriesId,
+                                    // seriesIndex: params.seriesIndex,
+                                    // seriesName: params.seriesName,
+
+                                })
+                            } else {
+                                graphChart.dispatchAction({
+                                    type: 'unfocusNodeAdjacency',
+                                });
+                            }
+                        });
+
+                        this.eChartsObj = graphChart;
+                        window.addEventListener("resize", function () {
+                            graphChart.resize();
+                        });
+
+                    })
+                },
+
+                changeTime(str) {
+                    let date = new Date(str),
+                        M = date.getMonth() + 1,
+                        D = date.getDate(),
+                        h = date.getHours(),
+                        m = date.getMinutes();
+                    /*显示样式 例如:08-20 12*/
+                    return M + '-' + D + ' ' + (h < 10 ? ('0' + h) : h) + ':' + (m < 10 ? ('0' + m) : m);
+                },
+
+            },
+            mounted() {
+                this.init()
+            },
+
+        })
+
+    </script>
+</body>
+
+</html>
